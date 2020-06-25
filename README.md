@@ -1,5 +1,9 @@
 # Data_Mining-for-2020-Semester
 
+2020/6/24新增：
+Final_Week.py 使用的数据集为skin和Wine的benchmark
+库使用的是PYOD，使用算法为KNN\MCD\COF\LOF\Iforest
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 DM_W4_CBG.py 和 DM_W4_Wine.py 分别处理的是 cbg_patterns.csv 和 winemag-data_first150k.csv
 
 数据集链接
