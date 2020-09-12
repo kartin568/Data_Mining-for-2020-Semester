@@ -1,0 +1,25 @@
+spring:
+  profiles:
+    active: @profileActive@
+  application:
+    name: @pom.artifactId@
+logging:
+  config: classpath:logback-spring.xml
+  path: /data/logs/gbdpcloud/${spring.application.name}  # ${spring.application.name}
+  file: ${spring.application.name}
+  level:
+    org.springframework: INFO
+#    instance-id: ${spring.application.name}:${spring.cloud.client.ipAddress}:${server.port}
+security:
+  oauth2:
+    client:
+      resource-ids: ${spring.application.name}
+
+pagehelper:
+  offsetAsPageNum: true
+  rowBoundsWithCount: true
+  reasonable: true
+  returnPageInfo: true
+  params: count=countSql
+  page-size-zero: true
+  support-methods-arguments: true

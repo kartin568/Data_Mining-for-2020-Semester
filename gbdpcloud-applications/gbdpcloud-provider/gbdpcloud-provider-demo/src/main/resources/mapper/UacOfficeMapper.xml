@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gbdpcloud.mapper.UacOfficeMapper">
+  <resultMap id="BaseResultMap" type="gbdpcloudprovideruserapi.gbdpcloudprovideruserapi.model.UacOffice">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="parent_id" jdbcType="VARCHAR" property="parentId" />
+    <result column="parent_ids" jdbcType="VARCHAR" property="parentIds" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="type" jdbcType="CHAR" property="type" />
+    <result column="grade" jdbcType="CHAR" property="grade" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="zip_code" jdbcType="VARCHAR" property="zipCode" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="fax" jdbcType="VARCHAR" property="fax" />
+    <result column="use_able" jdbcType="VARCHAR" property="useAble" />
+    <result column="primary_person" jdbcType="VARCHAR" property="primaryPerson" />
+    <result column="deputy_person" jdbcType="VARCHAR" property="deputyPerson" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+    <result column="remarks" property="remarks" jdbcType="VARCHAR"/>
+    <result column="del_flag" property="delFlag" jdbcType="CHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, parent_id, parent_ids, name, type, grade, sort, address, zip_code, phone, email, 
+    fax, use_able, primary_person_id, deputy_person_id, create_by, create_date, update_by, 
+    update_date, remarks, del_flag
+  </sql>
+
+  <select id="list" resultMap="BaseResultMap" >
+    SELECT* FROM uac_office WHERE del_flag = '0'  AND id != "0"
+  </select>
+
+  <!--过期，仅供参考-->
+  <select id="get" resultMap="BaseResultMap" >
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM uac_office t
+    WHERE t.del_flag = '0'
+    <if test="id != null and id != ''">
+      AND t.id = #{id}
+    </if>
+  </select>
+
+  <!--逻辑删除-->
+  <update id="deleteByLogic">
+        DELETE uac_office
+        WHERE id = #{id}
+    </update>
+
+  <update id="deleteManyByLogic">
+        DELETE uac_office
+        WHERE id IN (#{ids})
+    </update>
+
+  <select id="getByIds" resultMap="BaseResultMap" >
+    SELECT* FROM uac_office WHERE del_flag = '0' AND id in
+    <foreach collection="list" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+  </select>
+
+
+  <select id="selectByname" parameterType="String" resultMap="BaseResultMap">
+    SELECT *
+    from uac_office
+    where name = #{name} and del_flag = '0'
+  </select>
+
+  <select id="getAll" resultMap="BaseResultMap">
+    SELECT *
+    from uac_office
+    WHERE del_flag = '0' AND id != "0"
+  </select>
+
+
+  <select id="getchildren" parameterType="String" resultMap="BaseResultMap">
+    SELECT *
+    from uac_office
+    where parent_id = #{pid} and del_flag = '0'
+  </select>
+
+
+  <select id="getRoot" parameterType="String" resultMap="BaseResultMap">
+    SELECT *
+    from uac_office u
+    where u.id in (SELECT parent_id FROM uac_office where id ='0')
+  </select>
+
+
+  <update id="setRoot">
+    UPDATE uac_office
+    SET parent_id = #{id}
+    WHERE id ='0'
+  </update>
+
+</mapper>

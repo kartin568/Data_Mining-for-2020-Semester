@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gbdpcloud.mapper.UacRoleMapper">
+  <resultMap id="BaseResultMap" type="gbdpcloudprovideruserapi.gbdpcloudprovideruserapi.model.UacRole">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="enname" jdbcType="VARCHAR" property="enname" />
+    <result column="role_type" jdbcType="VARCHAR" property="roleType" />
+    <result column="data_scope" jdbcType="CHAR" property="dataScope" />
+    <result column="is_sys" jdbcType="VARCHAR" property="isSys" />
+    <result column="use_able" jdbcType="VARCHAR" property="useAble" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+    <result column="remarks" property="remarks" jdbcType="VARCHAR"/>
+    <result column="del_flag" property="delFlag" jdbcType="CHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, enname, role_type, data_scope, is_sys, use_able, create_by, create_date, 
+    update_by, update_date, remarks, del_flag
+  </sql>
+
+  <!--过期，仅供参考-->
+  <select id="list" resultMap="BaseResultMap" >
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM uac_role t
+    <where>
+      t.del_flag = '0'
+    </where>
+  </select>
+
+  <!--过期，仅供参考-->
+  <select id="get" resultMap="BaseResultMap" >
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM uac_role t
+    WHERE t.del_flag = '0'
+    <if test="id != null and id != ''">
+      AND t.id = #{id}
+    </if>
+  </select>
+
+  <!--逻辑删除-->
+  <update id="deleteByLogic">
+        DELETE uac_role
+        WHERE id = #{id}
+    </update>
+
+  <update id="deleteManyByLogic">
+        DELETE uac_role
+        WHERE id IN (#{ids})
+    </update>
+
+</mapper>

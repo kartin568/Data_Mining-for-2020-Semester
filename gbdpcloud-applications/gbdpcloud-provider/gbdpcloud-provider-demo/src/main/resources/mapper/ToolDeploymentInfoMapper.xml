@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gbdpcloud.mapper.ToolDeploymentInfoMapper">
+  <resultMap id="BaseResultMap" type="com.gbdpcloud.entity.ToolDeploymentInfo">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="tool" jdbcType="VARCHAR" property="tool" />
+    <result column="host" jdbcType="VARCHAR" property="host" />
+    <result column="port" jdbcType="INTEGER" property="port" />
+    <result column="state" jdbcType="VARCHAR" property="state" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+    <result column="remarks" property="remarks" jdbcType="VARCHAR"/>
+    <result column="del_flag" property="delFlag" jdbcType="CHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id,tool, host, port, state,
+    create_date, update_date, create_by, update_by, remarks, del_flag
+  </sql>
+
+  <!--过期，仅供参考-->
+  <select id="list" resultMap="BaseResultMap" >
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM tool_deployment_info t
+    <where>
+      t.del_flag = '0'
+    </where>
+  </select>
+
+  <!--过期，仅供参考-->
+  <select id="get" resultMap="BaseResultMap" >
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM tool_deployment_info t
+    WHERE t.del_flag = '0'
+    <if test="id != null and id != ''">
+      AND t.id = #{id}
+    </if>
+  </select>
+
+  <!--逻辑删除-->
+  <delete id="deleteByLogic">
+        DELETE from tool_deployment_info WHERE id = #{id}
+    </delete>
+
+  <delete id="deleteManyByLogic">
+        DELETE from tool_deployment_info WHERE id IN (#{ids})
+    </delete>
+
+</mapper>

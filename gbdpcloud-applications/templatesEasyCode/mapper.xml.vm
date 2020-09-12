@@ -1,0 +1,79 @@
+##引入mybatis支持
+    $!mybatisSupport
+
+##设置保存名称与保存位置
+    $!callback.setFileName($tool.append($!{tableInfo.name}, "Mapper.xml"))
+    $!callback.setSavePath($tool.append($modulePath, "/src/main/resources/mapper"))
+
+##拿到主键
+    #if(!$tableInfo.pkColumn.isEmpty())
+        #set($pk = $tableInfo.pkColumn.get(0))
+    #end
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="$!{tableInfo.savePackageName}.mapper.$!{tableInfo.name}Mapper">
+
+    <resultMap type="$!{tableInfo.savePackageName}.entity.$!{tableInfo.name}" id="BaseResultMap">
+        #foreach($column in $tableInfo.fullColumn)
+            <result property="$!column.name" column="$!column.obj.name" jdbcType="$!column.ext.jdbcType"/>
+        #end
+    </resultMap>
+
+    <sql id="Base_Column_Joins">
+    </sql>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+#foreach($column in $tableInfo.fullColumn)
+        #if($!column.obj.name != $!pk.obj.name)
+        t.$!column.obj.name,
+#end
+#end
+        t.$!pk.obj.name
+    </sql>
+
+    <select id="listPage" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from $!{tableInfo.obj.parent.name}.$!{tableInfo.obj.name} t
+        <include refid="Base_Column_Joins"/>
+        <where>
+            t.del_flag = '0'
+            <!-- 这里写查询筛选条件，下面是举例写法 -->
+            <if test="id != null and id != ''">
+                AND t.id = #{id}
+            </if>
+            <if test="remarks != null and remarks != ''">
+                AND t.remarks like CONCAT('%', #{remarks}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="get" resultMap="BaseResultMap" >
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM $!{tableInfo.obj.parent.name}.$!{tableInfo.obj.name} t
+        <include refid="Base_Column_Joins"/>
+        WHERE t.del_flag = '0'
+        <if test="id != null and id != ''">
+            AND t.id = #{id}
+        </if>
+    </select>
+
+    <!--逻辑删除-->
+    <update id="deleteByLogic">
+        UPDATE $!{tableInfo.obj.parent.name}.$!{tableInfo.obj.name} SET
+        del_flag = '1'
+        WHERE $!pk.obj.name = #{id}
+    </update>
+
+    <update id="deleteManyByLogic">
+        UPDATE $!{tableInfo.obj.parent.name}.$!{tableInfo.obj.name} SET
+        del_flag = '1'
+        WHERE $!pk.obj.name IN
+        <foreach item="ids" collection="array" open="(" separator="," close=")">
+            #{ids}
+        </foreach>
+    </update>
+</mapper>

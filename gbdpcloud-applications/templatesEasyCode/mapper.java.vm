@@ -1,0 +1,23 @@
+##导入宏定义
+$!define
+
+##设置表后缀（宏定义）
+#setTableSuffix("Mapper")
+
+##保存文件（宏定义）
+#save("/mapper", "Mapper.java")
+
+##包路径（宏定义）
+#setPackageSuffix("mapper")
+
+import gbdpcloudcommonbase.gbdpcloudcommonbase.core.IMapper;
+import org.apache.ibatis.annotations.Mapper;
+import $!{tableInfo.savePackageName}.entity.$!tableInfo.name;
+
+##表注释（宏定义）
+#tableComment("表数据库访问层")
+@Mapper
+public interface $!{tableName} extends IMapper<$!tableInfo.name> {
+        //这里写自定义的mapper方法
+}
+

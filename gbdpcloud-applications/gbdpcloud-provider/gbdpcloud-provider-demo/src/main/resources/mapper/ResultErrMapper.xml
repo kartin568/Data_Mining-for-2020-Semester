@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gbdpcloud.mapper.ResultErrMapper">
+  <resultMap id="BaseResultMap" type="com.gbdpcloud.entity.ResultErr">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="test_ID" jdbcType="VARCHAR" property="test_ID" />
+    <result column="rule" jdbcType="VARCHAR" property="rule" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="rule_type" jdbcType="VARCHAR" property="rule_type" />
+    <result column="source" jdbcType="VARCHAR" property="source" />
+    <result column="err_function" jdbcType="VARCHAR" property="err_function" />
+    <result column="err_line" jdbcType="VARCHAR" property="err_line" />
+    <result column="mark" jdbcType="CHAR" property="mark" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+    <result column="remarks" property="remarks" jdbcType="VARCHAR"/>
+    <result column="del_flag" property="delFlag" jdbcType="CHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, test_ID, rule, code, rule_type, source, err_function, err_line, mark,
+    create_date, update_date, create_by, update_by, remarks, del_flag
+  </sql>
+
+  <!--过期，仅供参考-->
+  <select id="list" resultMap="BaseResultMap" >
+    SELECT* FROM result_err WHERE t.del_flag = '0'
+  </select>
+
+  <!--过期，仅供参考-->
+  <select id="get" resultMap="BaseResultMap" >
+    SELECT* FROM result_err WHERE del_flag = '0' AND id = #{id}
+  </select>
+
+  <select id="getByTest" resultMap="BaseResultMap" >
+    SELECT* FROM result_err WHERE del_flag = '0' AND test_ID = #{id}
+  </select>
+
+  <!--逻辑删除-->
+  <update id="deleteByLogic">
+        DELETE from result_err WHERE id = #{id}
+    </update>
+
+  <update id="deleteManyByLogic">
+        DELETE from result_err WHERE id IN (#{ids})
+    </update>
+
+  <select id="selectByTestID" parameterType="String" resultMap="BaseResultMap">
+    SELECT *
+    from result_err
+    where del_flag = '0' AND test_ID = #{id}
+  </select>
+
+
+</mapper>

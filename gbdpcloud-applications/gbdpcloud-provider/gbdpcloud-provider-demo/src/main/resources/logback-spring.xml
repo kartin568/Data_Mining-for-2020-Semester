@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 日志级别从低到高分为TRACE < DEBUG < INFO < WARN < ERROR < FATAL，如果设置为WARN，则低于WARN的信息都不会输出 -->
+<!-- scan:当此属性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true -->
+<!-- scanPeriod:设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。 -->
+<!-- debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 -->
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    ​
+    <springProperty scope="context" name="springAppName" source="spring.application.name"/>
+    <springProperty scope="context" name="port" source="server.port"/>
+    <conversionRule conversionWord="ip" converterClass="gbdpcloudcommonbase.gbdpcloudcommonbase.log.IPLogConfig" />
+
+    <!-- Example for logging into the build folder of your project -->
+    <!--<property name="LOG_PATH" value="/data/logs/gbdpcloud/${springAppName}"/>
+    <property name="LOG_FILE" value="${springAppName}"/>-->
+
+    <!-- 配置在application.yml中动态获取logPath 和 logFile -->
+    <springProperty scope="content" name="LOG_PATH" source="logging.path"/>
+    <springProperty scope="content" name="LOG_FILE" source="logging.file"/>
+    <springProperty scope="content" name="LOG_LEVEL" source="logging.level"/>
+
+    <!-- 彩色日志 -->
+    <!-- 彩色日志依赖的渲染类 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} [%contextName - %ip:${port} %clr(${PID:- }){magenta}] %clr(%level) %clr([${springAppName:-},%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-B3-ParentSpanId:-},%X{X-Span-Export:-}]){yellow} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
+    <!-- ****************************************************************************************** -->
+    <!-- ****************************** 本地开发只在控制台打印日志 ************************************ -->
+    <!-- ****************************************************************************************** -->
+    <springProfile name="dev">
+        <!-- [%contextName - %ip] -->
+        <!-- Appender to log to console -->
+        <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <!-- Minimum logging level to be presented in the console logs -->
+                <level>INFO</level>
+            </filter>
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                <charset>utf8</charset>
+            </encoder>
+        </appender>
+
+        <logger name="org.apache" level="INFO" />
+        <logger name="org.apache.http.wire" level="WARN" />
+        <logger name="org.apache.http.headers" level="WARN" />
+        <logger name="com.ibatis" level="DEBUG" />
+        <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="DEBUG" />
+        <logger name="com.ibatis.common.jdbc.ScriptRunner" level="DEBUG" />
+        <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="DEBUG" />
+        <logger name="java.sql.Connection" level="DEBUG" />
+        <logger name="java.sql.Statement" level="DEBUG" />
+        <logger name="java.sql.PreparedStatement" level="DEBUG" />
+        <logger name="java.sql.ResultSet" level="DEBUG" />
+        <logger name="gbdpcloudprovideruserac.gbdpcloudprovideruserac.dao" level="DEBUG" />
+
+        <!--默认所有的包以info-->
+        <root level="info">
+            <appender-ref ref="console"/>
+        </root>
+    </springProfile>
+
+    <!-- ********************************************************************************************** -->
+    <!-- **** 放到服务器上不管在什么环境都只在文件记录日志，控制台（catalina.out）打印logback捕获不到的日志 **** -->
+    <!-- ********************************************************************************************** -->
+    <springProfile name="!dev">
+
+        <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                <charset>utf-8</charset>
+            </encoder>
+        </appender>
+
+        <!-- Appender to log to file -->
+        <appender name="flatfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <!-- 正在记录的日志文件的路径及文件名 -->
+            <file>${LOG_PATH}/${LOG_FILE}.log</file>
+            <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_PATH}/daily/${LOG_FILE}.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
+                <maxHistory>7</maxHistory>
+            </rollingPolicy>
+            <!--日志文件输出格式-->
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                <charset>utf8</charset>
+            </encoder>
+        </appender>
+        ​
+        <!-- 时间滚动输出 level为 ERROR 日志 -->
+        <appender name="errorfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <!-- 正在记录的日志文件的路径及文件名 -->
+            <file>${LOG_PATH}/${LOG_FILE}-error.log</file>
+            <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_PATH}/daily/${LOG_FILE}-error.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
+                <!--日志文件保留天数-->
+                <maxHistory>15</maxHistory>
+            </rollingPolicy>
+            <!-- 此日志文件只记录ERROR级别的 -->
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>ERROR</level>
+                <!-- 如果命中就使用这条日志 -->
+                <onMatch>ACCEPT</onMatch>
+                <!-- 如果没有命中就禁止这条规则 -->
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <!--日志文件输出格式-->
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%contextName - %ip] [%thread] %-5level %logger{50} - %msg%n</pattern>
+                <charset>UTF-8</charset> <!-- 此处设置字符集 -->
+            </encoder>
+        </appender>
+
+        <!-- Appender to log to file in a JSON format -->
+        <appender name="logstash" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <!-- 正在记录的日志文件的路径及文件名 -->
+            <file>${LOG_PATH}/${LOG_FILE}-json.log</file>
+            <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_PATH}/daily/${LOG_FILE}-json.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
+                <maxHistory>7</maxHistory>
+            </rollingPolicy>
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <timestamp>
+                        <timeZone>UTC</timeZone>
+                    </timestamp>
+                    <pattern>
+                        <pattern>
+                            {
+                            "severity": "%level",
+                            "service": "${springAppName:-}",
+                            "trace": "%X{X-B3-TraceId:-}",
+                            "span": "%X{X-B3-SpanId:-}",
+                            "parent": "%X{X-B3-ParentSpanId:-}",
+                            "exportable": "%X{X-Span-Export:-}",
+                            "pid": "${PID:-}",
+                            "thread": "%thread",
+                            "class": "%logger{40}",
+                            "rest": "%message"
+                            }
+                        </pattern>
+                    </pattern>
+                </providers>
+            </encoder>
+        </appender>
+
+        <appender name="MyBatisStatistics" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_PATH}/daily/${LOG_FILE}-sql.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
+                <maxHistory>10</maxHistory>
+            </rollingPolicy>
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}-%msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <logger name="org.apache" level="INFO" />
+        <logger name="org.apache.http.wire" level="WARN" />
+        <logger name="org.apache.http.headers" level="WARN" />
+        <logger name="com.ibatis" level="DEBUG" >
+            <appender-ref ref="MyBatisStatistics"/>
+        </logger>
+        <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="DEBUG" >
+            <appender-ref ref="MyBatisStatistics"/>
+        </logger>
+        <logger name="com.ibatis.common.jdbc.ScriptRunner" level="DEBUG" >
+            <appender-ref ref="MyBatisStatistics"/>
+        </logger>
+        <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="DEBUG" >
+            <appender-ref ref="MyBatisStatistics"/>
+        </logger>
+        <logger name="java.sql.Connection" level="DEBUG" >
+            <appender-ref ref="MyBatisStatistics"/>
+        </logger>
+        <logger name="java.sql.Statement" level="DEBUG" >
+            <appender-ref ref="MyBatisStatistics"/>
+        </logger>
+        <logger name="java.sql.PreparedStatement" level="DEBUG" >
+            <appender-ref ref="MyBatisStatistics"/>
+        </logger>
+        <logger name="java.sql.ResultSet" level="DEBUG" >
+            <appender-ref ref="MyBatisStatistics"/>
+        </logger>
+        <logger name="com.gbdpcloud.mapper" level="DEBUG" >
+            <appender-ref ref="MyBatisStatistics"/>
+        </logger>
+        <logger name="gbdpcloudprovideruserac.gbdpcloudprovideruserac.dao" level="DEBUG" >
+            <appender-ref ref="MyBatisStatistics"/>
+        </logger>
+
+        <!--记录到文件时，记录两类一类是error日志，一个是所有日志-->
+        <root level="${LOG_LEVEL}">
+            <appender-ref ref="console"/>
+            <appender-ref ref="logstash"/>
+            <appender-ref ref="flatfile"/>
+            <appender-ref ref="errorfile"/>
+        </root>
+
+    </springProfile>
+</configuration>

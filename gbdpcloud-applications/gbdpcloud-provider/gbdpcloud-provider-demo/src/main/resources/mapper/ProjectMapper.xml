@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gbdpcloud.mapper.ProjectMapper">
+  <resultMap id="BaseResultMap" type="com.gbdpcloud.entity.Project">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="platform" jdbcType="VARCHAR" property="platform" />
+    <result column="leader" jdbcType="VARCHAR" property="leader" />
+    <result column="member" jdbcType="VARCHAR" property="member" />
+    <result column="ranges" jdbcType="VARCHAR" property="ranges" />
+    <result column="compiler" jdbcType="VARCHAR" property="compiler" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+    <result column="remarks" property="remarks" jdbcType="VARCHAR"/>
+    <result column="source" property="source" jdbcType="VARCHAR"/>
+    <result column="del_flag" property="delFlag" jdbcType="CHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, type, platform, leader, member, ranges, create_date, update_date, create_by,
+    update_by, compiler, remarks, del_flag, source
+  </sql>
+
+  <!--过期，仅供参考-->
+  <select id="list" resultMap="BaseResultMap" >
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM project t
+    <where>
+      t.del_flag = '0'
+    </where>
+  </select>
+
+  <select id="get" resultMap="BaseResultMap" >
+    SELECT * FROM project WHERE del_flag = '0' AND id =#{id}
+  </select>
+
+  <!--逻辑删除-->
+  <update id="deleteByLogic">
+        DELETE from project WHERE id = #{id}
+    </update>
+
+  <update id="deleteManyByLogic">
+        DELETE from project WHERE id IN (#{ids})
+    </update>
+
+  <select id="selectIds" resultMap="BaseResultMap" >
+    SELECT* FROM project WHERE del_flag = '0' AND id in
+    <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+    </foreach>
+  </select>
+
+  <select id="getAll" resultMap="BaseResultMap" >
+    SELECT* FROM project WHERE del_flag = '0'
+  </select>
+
+</mapper>

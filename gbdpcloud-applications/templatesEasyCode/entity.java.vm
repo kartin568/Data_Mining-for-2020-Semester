@@ -1,0 +1,37 @@
+##引入宏定义
+$!define
+
+##使用宏定义设置回调（保存位置与文件后缀）
+#save("/entity", ".java")
+#set($baseList = $tool.newArrayList("id", "createDate", "delFlag", "updateDate", "createBy", "updateBy", "remarks"))
+##使用宏定义设置包后缀
+#setPackageSuffix("entity")
+
+##使用全局变量实现默认包导入
+$!autoImport
+import java.io.Serializable;
+import gbdpcloudcommonbase.gbdpcloudcommonbase.core.BaseEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+
+import javax.persistence.Table;
+##使用宏定义实现类注释信息
+#tableComment("实体类")
+@Data
+@EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
+@Table(name = "$tableInfo.obj.name")
+public class $!{tableInfo.name} extends BaseEntity {
+private static final long serialVersionUID = $!tool.serial();
+#foreach($column in $tableInfo.fullColumn)
+#if(!$!baseList.contains($column.name))
+#if(${column.comment} && ${column.name})
+        /**
+         * ${column.comment}
+         */
+#end
+        private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
+#end
+#end
+}

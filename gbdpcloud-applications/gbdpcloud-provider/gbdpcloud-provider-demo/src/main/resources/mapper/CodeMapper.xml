@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gbdpcloud.mapper.CodeMapper">
+  <resultMap id="BaseResultMap" type="com.gbdpcloud.entity.Code">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="code_version_ID" jdbcType="VARCHAR" property="code_version_ID" />
+    <result column="project_ID" jdbcType="VARCHAR" property="project_ID" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="version" jdbcType="VARCHAR" property="version" />
+    <result column="source_code" jdbcType="VARCHAR" property="source_code" />
+    <result column="configuration" jdbcType="VARCHAR" property="configuration" />
+    <result column="path" jdbcType="VARCHAR" property="path" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+    <result column="remarks" property="remarks" jdbcType="VARCHAR"/>
+    <result column="del_flag" property="delFlag" jdbcType="CHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, project_ID, code_version_ID, name, version, source_code, create_date, update_date, configuration,
+    create_by, update_by, path, remarks, del_flag
+  </sql>
+
+  <!--过期，仅供参考-->
+  <select id="list" resultMap="BaseResultMap" >
+    SELECT* FROM code where del_flag = '0'
+  </select>
+
+  <!--过期，仅供参考-->
+  <select id="get" resultMap="BaseResultMap" >
+    SELECT *from code WHERE del_flag = '0' and id = #{id}
+  </select>
+
+  <select id="getByProject" resultMap="BaseResultMap" >
+    SELECT *from code WHERE del_flag = '0' and project_ID = #{id}
+  </select>
+
+  <select id="getByProjectAndVersion" resultMap="BaseResultMap" >
+    SELECT *from code WHERE del_flag = '0' and project_ID = #{arg0} and version = #{arg1 }
+  </select>
+
+  <select id="getByCodeVersion" resultMap="BaseResultMap" >
+    SELECT *from code WHERE del_flag = '0' and code_version_ID = #{id}
+  </select>
+
+  <!--逻辑删除-->
+  <update id="deleteByLogic">
+        DELETE from code WHERE id = #{id}
+    </update>
+
+  <update id="deleteManyByLogic">
+        DELETE from code WHERE id IN (#{ids})
+    </update>
+
+
+  <select id="selectProjectVserionAndName"  resultMap="BaseResultMap">
+    SELECT *
+    from code
+    where name = #{name} and version= #{version} and project_ID = #{pid} and del_flag = '0'
+  </select>
+
+
+</mapper>

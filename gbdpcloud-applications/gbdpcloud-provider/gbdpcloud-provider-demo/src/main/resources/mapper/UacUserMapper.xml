@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gbdpcloud.mapper.UacUserMapper">
+  <resultMap id="BaseResultMap" type="gbdpcloudprovideruserapi.gbdpcloudprovideruserapi.model.UacUser">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="login_name" jdbcType="VARCHAR" property="loginName" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="user_code" jdbcType="VARCHAR" property="userCode" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="photo" jdbcType="VARCHAR" property="photo" />
+    <result column="user_source" jdbcType="VARCHAR" property="userSource" />
+    <result column="last_login_ip" jdbcType="VARCHAR" property="lastLoginIp" />
+    <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="is_changed_pwd" jdbcType="SMALLINT" property="isChangedPwd" />
+    <result column="pwd_error_count" jdbcType="SMALLINT" property="pwdErrorCount" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+    <result column="remarks" property="remarks" jdbcType="VARCHAR"/>
+    <result column="del_flag" property="delFlag" jdbcType="CHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, login_name, password, user_code, name, phone, email, photo, user_source, last_login_ip, 
+    last_login_time, status, is_changed_pwd, pwd_error_count, create_by, create_date, 
+    update_by, update_date, remarks, del_flag
+  </sql>
+
+  <!--过期，仅供参考-->
+  <select id="list" resultMap="BaseResultMap" >
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM uac_user t
+    <where>
+      t.del_flag = '0'
+    </where>
+  </select>
+
+  <select id="get" resultMap="BaseResultMap" >
+    SELECT * FROM uac_user WHERE del_flag = '0' AND id = #{id}
+  </select>
+
+  <select id="getNameById" resultMap="BaseResultMap" >
+    SELECT * FROM uac_user WHERE del_flag = '0' AND id = #{id}
+  </select>
+
+  <!--逻辑删除-->
+  <update id="deleteByLogic">
+        DELETE uac_user
+        WHERE id = #{id}
+    </update>
+
+  <update id="deleteManyByLogic">
+        DELETE uac_user
+        WHERE id IN (#{ids})
+    </update>
+
+
+
+  <select id="selectByName" resultMap="BaseResultMap" >
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM uac_user t
+    <where>
+      t.del_flag = '0' and t.login_name = #{username}
+    </where>
+  </select>
+
+</mapper>

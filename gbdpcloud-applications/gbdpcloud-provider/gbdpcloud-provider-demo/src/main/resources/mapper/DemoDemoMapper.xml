@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gbdpcloud.mapper.DemoDemoMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gbdpcloud.entity.DemoDemo">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="demo_str" property="demoStr" jdbcType="VARCHAR"/>
+        <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+        <result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+        <result column="remarks" property="remarks" jdbcType="VARCHAR"/>
+        <result column="del_flag" property="delFlag" jdbcType="CHAR"/>
+    </resultMap>
+ 
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        t.id,
+        t.demo_str AS "demoStr",
+        t.create_by AS "createBy",
+        t.create_date AS "createDate",
+        t.update_by AS "updateBy",
+        t.update_date AS "updateDate",
+        t.remarks AS "remarks",
+        t.del_flag AS "delFlag"
+    </sql>
+
+    <sql id="Base_Column_Joins">
+        LEFT JOIN uac_user uu ON uu.id = t.create_by
+        LEFT JOIN uac_user_office uuo ON uuo.user_id = uu.id
+        LEFT JOIN uac_office uo ON uo.id = uuo.office_id
+    </sql>
+
+    <!--过期，仅供参考-->
+    <select id="list" resultMap="BaseResultMap" >
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM demo_demo t
+        <include refid="Base_Column_Joins"/>
+        <where>
+            t.del_flag = '0'
+        </where>
+    </select>
+
+    <!--过期，仅供参考-->
+    <select id="get" resultMap="BaseResultMap" >
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM demo_demo t
+        <include refid="Base_Column_Joins"/>
+        WHERE t.del_flag = '0'
+        <if test="id != null and id != ''">
+            AND t.id = #{id}
+        </if>
+    </select>
+
+    <!--逻辑删除-->
+    <update id="deleteByLogic">
+        UPDATE demo_demo SET
+        del_flag = '1'
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteManyByLogic">
+        UPDATE demo_demo SET
+        del_flag = '1'
+        WHERE id IN (#{ids})
+    </update>
+
+</mapper>

@@ -1,0 +1,43 @@
+spring:
+  cloud:
+    config:
+      fail-fast: true
+      name: testserver  #此物对应discovery下config目录下的yml文件的名
+      profile: ${spring.profiles.active}
+      discovery:
+        service-id: gbdpcloud-discovery
+        enabled: true
+#      profile: dev
+#      label: master
+#      #uri: http://localhost:8888/
+#      username: lihaifeng
+#      password: lihaifeng
+      retry:
+        initial-interval: 2000  #初始重试间隔（以毫秒为单位）
+        max-attempts: 6 #最大尝试次数
+        max-interval: 2000 #退避的最大间隔
+        multiplier: 1.2 #下一个间隔的乘数。
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://81.70.7.10:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE  #加上这个就可以获取到HttpServletRequest
+          thread:
+            timeoutInMilliseconds: 10000
